@@ -68,7 +68,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   res.textContent = "⏳ Autenticando...";
   
   try {
-    const response = await fetch("http://localhost:8000/authenticate", {
+    const response = await fetch("https://nfcblockchain.vercel.app/", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({nfc_id, pin, device_id})
@@ -88,3 +88,4 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 </script>
 </body>
 </html>
+
