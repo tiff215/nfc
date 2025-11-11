@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login NFC + Blockchain (Local)</title>
+<style>
+body {
+  background: linear-gradient(135deg, #1a237e, #283593);
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+form {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 320px;
+  text-align: center;
+}
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+}
+button {
+  padding: 10px;
+  width: 100%;
+  background: #00c853;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:hover { background: #00e676; }
+#result { margin-top: 15px; white-space: pre-line; text-align: left; }
+small { opacity: 0.9; display:block; margin-top:8px; }
+</style>
+</head>
+<body>
+
+  <form id="loginForm">
+    <h2>Autenticación NFC</h2>
+    <input type="text" id="nfc_id" placeholder="UID NFC" required>
+    <input type="password" id="pin" placeholder="PIN" required>
+    <button type="submit">Iniciar Sesión</button>
+    <div id="result"></div>
+    <small>Usuarios de prueba: analopez, carlosruiz, mariatorres, aimee</small>
+  </form>
+
+<script>
+/*
+  Usuarios "guardados" localmente para pruebas.
+  Formato: llave (nfc_id) : { pin, full_name, department }
+*/
+const USERS = {
+  "analopez":    { "pin": "1234", "full_name": "Ana Lopez",    "department": "Inteligencia" },
+  "carlosruiz":  { "pin": "5678", "full_name": "Carlos Ruiz",  "department": "Analisis" },
+  "mariatorres": { "pin": "9012", "full_name": "Maria Torres", "department": "Operaciones" },
+  "aimee":       { "pin": "0000", "full_name": "Aimee",        "department": "Desarrollo" }
+};
+
+// Generador simple de "tx" simulada (hex corto)
+function generarTxSimulada() {
+  const hex = Array.from({length: 12}, () => Math.floor(Math.random()*16).toString(16)).join('');
+  return '0x' + hex;
+}
+
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nfc_id = document.getElementById("nfc_id").value.trim();
+  const pin = document.getElementById("pin").value.trim();
+  const res = document.getElementById("result");
+
+  if (!nfc_id || !pin) {
+    res.textContent = "❌ Completa ambos campos.";
+    return;
+  }
+
+  res.textContent = "⏳ Autenticando localmente...";
+
+  // Validación local
+  const user = USERS[nfc_id];
+  if (user && user.pin === pin) {
+    const tx = generarTxSimulada();
+    // opcional: guardar session mínima (solo para la sesión del navegador)
+    sessionStorage.setItem('usuario_activo', JSON.stringify({ id: nfc_id, full_name: user.full_name, department: user.department, tx }));
+
+    res.innerText = `✅ Usuario registrado.\n\n👤 Nombre: ${user.full_name}\n🏢 Departamento: ${user.department}\n`;
+    res.style.color = "lightgreen";
+    return;
+  }
+
+  
+  res.textContent = "❌ Usuario o PIN incorrecto";
+  res.style.color = "salmon";
+});
+</script>
+
+</body>
+</html>
